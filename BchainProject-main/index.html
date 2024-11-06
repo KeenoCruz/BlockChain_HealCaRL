@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealCaRL: Healthcare Record Ledger</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+        * {
+            text-decoration: none;
+            box-sizing: border-box;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 15px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        label, button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h1 {
+            color: #0066cc;
+            text-align: center;
+        }
+
+        #role, #username, #contractAddress {
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>HealCaRL: Healthcare Record Ledger</h1>
+        <h2>Login</h2>
+        <label for="uslacername">Username:</label>
+        <input type="text" id="username" placeholder="Enter your name" required>
+
+        <label for="contractAddress">Contract Address:</label>
+        <input type="text" id="contractAddress" placeholder="Enter contract address" required>
+
+        <label for="role">Login as:</label>
+        <select id="role" required>
+            <option value="doctor">Doctor</option>
+            <option value="patient">Patient</option>
+        </select>
+
+        <button onclick="login()">Login</button>
+    </div>
+
+    <script>
+        function login() {
+            const username = document.getElementById("username").value;
+            const role = document.getElementById("role").value;
+            const contractAddress = document.getElementById("contractAddress").value;
+
+            if (!username || !contractAddress) {
+                alert("Please enter your username and contract address.");
+                return;
+            }
+
+            // Save username, role, and contract address in local storage
+            localStorage.setItem('username', username);
+            localStorage.setItem('role', role);
+            localStorage.setItem('contractAddress', contractAddress);
+
+            if (role === 'doctor') {
+                window.location.href = 'editView.html' ; // Redirect to doctor (full access) page
+            } else if (role === 'patient') {
+                window.location.href = 'viewOnly.html'; // Redirect to patient (view-only) page
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Record NFT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-left, .form-right {
+            width: 48%;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .form-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .records {
+            margin-top: 20px;
+        }
+        .recordDetails {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Healthcare Record NFT System</h1>
+
+<h2>Add a New Record</h2>
+<form id="recordForm">
+    <div class="form-left">
+        <div class="form-group">
+            <label for="patientName">Patient Name:</label>
+            <input type="text" id="patientName" required>
+        </div>
+        <div class="form-group">
+            <label for="sex">Sex:</label>
+            <input type="text" id="sex" required>
+        </div>
+        <div class="form-group">
+            <label for="birthDate">Birth Date:</label>
+            <input type="text" id="birthDate" required>
+        </div>
+        <div class="form-group">
+            <label for="patientAddress">Patient Address:</label>
+            <input type="text" id="patientAddress" required>
+        </div>
+        <div class="form-group">
+            <label for="bloodType">Blood Type:</label>
+            <input type="text" id="bloodType" required>
+        </div>
+    </div>
+
+    <div class="form-right">
+        <div class="form-group">
+            <label for="physicianName">Physician Name:</label>
+            <input type="text" id="physicianName" required>
+        </div>
+        <div class="form-group">
+            <label for="physicianAddress">Physician Address:</label>
+            <input type="text" id="physicianAddress" required>
+        </div>
+        <div class="form-group">
+            <label for="knownMedConditions">Known Medical Conditions:</label>
+            <input type="text" id="knownMedConditions" required>
+        </div>
+        <div class="form-group">
+            <label for="diagnosis">Diagnosis:</label>
+            <input type="text" id="diagnosis" required>
+        </div>
+        <div class="form-group">
+            <label for="treatment">Treatment:</label>
+            <input type="text" id="treatment" required>
+        </div>
+        <div class="form-group">
+            <label for="allergies">Allergies:</label>
+            <input type="text" id="allergies" required>
+        </div>
+    </div>
+</form>
+
+<div class="form-buttons">
+    <button type="button" class="btn" onclick="addRecord()">Add Record</button>
+</div>
+
+<h2>Get a Record by ID</h2>
+<div class="form-group">
+    <label for="recordId">Record ID:</label>
+    <input type="number" id="recordId">
+</div>
+<button type="button" class="btn" onclick="getRecordById()">Get Record</button>
+
+<h2>All Records</h2>
+<button type="button" class="btn" onclick="getAllRecords()">Get All Records</button>
+<div id="recordDetails" class="records"></div>
+
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
+<script>
+    const contractAddress = 'YOUR_CONTRACT_ADDRESS';
+    const contractABI = /* ABI goes here */;
+
+    let web3;
+    let contract;
+
+    async function loadWeb3() {
+        if (window.ethereum) {
+            web3 = new Web3(window.ethereum);
+            await window.ethereum.enable();
+        } else {
+            alert('Please install MetaMask!');
+        }
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+    }
+
+    async function addRecord() {
+        const accounts = await web3.eth.getAccounts();
+        const patientName = document.getElementById('patientName').value;
+        const sex = document.getElementById('sex').value;
+        const birthDate = document.getElementById('birthDate').value;
+        const patientAddress = document.getElementById('patientAddress').value;
+        const bloodType = document.getElementById('bloodType').value;
+
+        const physicianName = document.getElementById('physicianName').value;
+        const physicianAddress = document.getElementById('physicianAddress').value;
+        const knownMedConditions = document.getElementById('knownMedConditions').value;
+        const diagnosis = document.getElementById('diagnosis').value;
+        const treatment = document.getElementById('treatment').value;
+        const allergies = document.getElementById('allergies').value;
+
+        await contract.methods.addRecord(
+            patientName, sex, birthDate, patientAddress, bloodType,
+            physicianName, physicianAddress, knownMedConditions,
+            diagnosis, treatment, allergies
+        ).send({ from: accounts[0] });
+
+        alert('Record added successfully!');
+    }
+
+    async function getRecordById() {
+        const recordId = document.getElementById('recordId').value;
+        try {
+            const record = await contract.methods.getRecordById(recordId).call();
+            const recordHtml = `<div class="recordDetails">
+                <p><b>Patient Name:</b> ${record[0]}</p>
+                <p><b>Sex:</b> ${record[1]}</p>
+                <p><b>Birth Date:</b> ${record[2]}</p>
+                <p><b>Patient Address:</b> ${record[3]}</p>
+                <p><b>Blood Type:</b> ${record[4]}</p>
+                <p><b>Physician Name:</b> ${record[5]}</p>
+                <p><b>Physician Address:</b> ${record[6]}</p>
+                <p><b>Known Medical Conditions:</b> ${record[7]}</p>
+                <p><b>Diagnosis:</b> ${record[8]}</p>
+                <p><b>Treatment:</b> ${record[9]}</p>
+                <p><b>Allergies:</b> ${record[10]}</p>
+                <p><b>Timestamp:</b> ${new Date(record[11] * 1000).toLocaleString()}</p>
+            </div>`;
+            document.getElementById('recordDetails').innerHTML = recordHtml;
+        } catch (error) {
+            alert("Failed to fetch record: " + error.message);
+        }
+    }
+
+    async function getAllRecords() {
+        try {
+            const tokenIds = await contract.methods.getAllTokenIds().call();
+            let recordsHtml = "";
+            for (let i = 0; i < tokenIds.length; i++) {
+                const record = await contract.methods.getRecordById(tokenIds[i]).call();
+                recordsHtml += `<div class="recordDetails">
+                    <p><b>Token ID ${tokenIds[i]}:</b></p>
+                    <p>Patient Name: ${record[0]}</p>
+                    <p>Diagnosis: ${record[8]}</p>
+                    <p>Treatment: ${record[9]}</p>
+                </div>`;
+            }
+            document.getElementById('recordDetails').innerHTML = recordsHtml;
+        } catch (error) {
+            alert("Failed to fetch records: " + error.message);
+        }
+    }
+
+    loadWeb3();
+    // add input for contract address before connecting to metamask
+</script>
+
+</body>
+</html>

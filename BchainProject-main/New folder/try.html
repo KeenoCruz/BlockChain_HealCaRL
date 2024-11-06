@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HAUthentiCred - Add New Credential</title>
+    <!-- Add Web3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.1/web3.min.js"></script>
+    <style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			height: 100vh;
+			background-color: #f0f0f0;
+		}
+
+		.sidebar {
+			width: 200px;
+			background-color: #1a3a5c;
+			color: white;
+			padding: 20px;
+		}
+
+		.logo {
+			font-size: 25px;
+			font-weight: bold;
+			margin-bottom: 30px;
+			margin-top: 20px;
+		}
+
+		.sidebar-button {
+			display: block;
+			width: 100%;
+			padding: 10px;
+			margin-bottom: 10px;
+			background: none;
+			border: none;
+			color: white;
+			text-align: left;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		.sidebar-button:hover,
+		.sidebar-button.active {
+			background-color: #2c5282;
+		}
+
+		.main-content {
+			flex-grow: 1;
+			padding: 20px;
+		}
+
+		.welcome-banner {
+			background-color: #1a3a5c;
+			color: white;
+			padding: 20px;
+			padding-left: 5%;
+			padding-right: 5%;
+			border-radius: 10px;
+			margin-bottom: 20px;
+		}
+
+		.welcome-banner .date {
+			font-size: 14px;
+			margin-bottom: 10px;
+		}
+
+		.credential-form {
+			background-color: white;
+			border-radius: 10px;
+			padding-top: 3%;
+			padding-bottom: 4%;
+			padding-left: 5%;
+			padding-right: 5%;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 5px;
+			color: #666;
+		}
+
+		.form-group input[type="text"],
+		.form-group input[type="date"] {
+			width: 98%;
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+			font-size: 16px;
+		}
+
+		.file-upload {
+			position: relative;
+		}
+
+		.file-upload input[type="file"] {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			cursor: pointer;
+		}
+
+		.file-upload-placeholder {
+			border: 2px dashed #1a3a5c;
+			border-radius: 5px;
+			padding: 20px;
+			text-align: center;
+			color: #1a3a5c;
+		}
+
+		.file-upload-placeholder img {
+			width: 40px;
+			margin-bottom: 10px;
+		}
+
+		.submit-button {
+			display: block;
+			width: 100%;
+			padding: 15px;
+			background-color: #1a3a5c;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+		}
+
+		.submit-button:hover {
+			background-color: #2c5282;
+		}
+
+		#logout {
+			margin-top: auto;
+		}
+
+		.file-upload-placeholder {
+			border: 2px dashed #1a3a5c;
+			border-radius: 5px;
+			padding: 20px;
+			text-align: center;
+			color: #1a3a5c;
+			min-height: 60px;
+			/* Added to maintain consistent height */
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.file-upload-placeholder img {
+			width: 40px;
+			margin-bottom: 10px;
+		}
+
+		.logo-pic {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.logo-image {
+			width: 200px;
+			/* Adjust as needed */
+			height: auto;
+		}
+
+		.logo-text {
+			font-size: 18px;
+			font-weight: bold;
+		}
+	</style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-pic">
+            <img src="white logo.png" alt="HAUthentiCred Logo" class="logo-image" />
+        </div>
+        <div class="logo">HAUthentiCred</div>
+        <button class="sidebar-button" onclick="location.href='my-credentials.html'">My Credentials</button>
+        <button class="sidebar-button" onclick="location.href='pending-credentials.html'">Pending Credentials</button>
+        <button class="sidebar-button active">Add Credential</button>
+        <button class="sidebar-button" id="logout" onclick="location.href='../landing.html'">Logout</button>
+    </div>
+    <div class="main-content">
+        <div class="welcome-banner">
+            <h2>Welcome back, Mark!</h2>
+            <p>Secure your Future, One Block at a Time.</p>
+        </div>
+        <div class="credential-form">
+            <h2>Add New Credential</h2>
+            <form id="add-credential-form">
+                <div class="form-group">
+                    <label for="credential-title">Credential Title</label>
+                    <input type="text" id="credential-title" name="credential-title" placeholder="eg. Regional Blockchain Conference 2024" />
+                </div>
+                <div class="form-group">
+                    <label for="organization">Organization / Institution</label>
+                    <input type="text" id="organization" name="organization" placeholder="eg. Amazon Web Services" />
+                </div>
+                <div class="form-group">
+                    <label for="date-issued">Date Issued</label>
+                    <input type="text" id="date-issued" name="date-issued" value="2024-10-10" />
+                </div>
+                <button type="submit" class="submit-button">+ Submit Credential</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript to interact with the smart contract -->
+    <script>
+        // Make sure Web3 is injected (e.g., by MetaMask)
+        if (typeof window.ethereum !== 'undefined') {
+            console.log('MetaMask is installed!');
+        }
+
+        const web3 = new Web3(window.ethereum);
+
+        // The contract address and ABI (replace with your contract's deployed address)
+        const contractAddress = '0x769AfD4946953ff086915Afc5db090d55055f282';
+        const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_credentialName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_organization",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_dateIssued",
+				"type": "string"
+			}
+		],
+		"name": "addCredential",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "CredentialAdded",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getCredential",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			}
+		],
+		"name": "getCredentialCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "userCredentials",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "credentialName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "organization",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "dateIssued",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "status",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+        const credentialManager = new web3.eth.Contract(contractABI, contractAddress);
+
+        // Function to add a new credential
+        async function addCredential(credentialTitle, organization, dateIssued) {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+
+            try {
+				await credentialManager.methods.addCredential(credentialTitle, organization, dateIssued).send({
+					from: accounts[0]
+				});
+				alert('Credential added successfully!');
+			} catch (error) {
+				console.error('Error adding credential:', error);
+
+				// Check if the error has a specific code
+				if (error.code === 4001) {
+					// User rejected the transaction in MetaMask
+					alert('Transaction rejected by the user.');
+				} else if (error.message.includes('gas')) {
+					// Gas-related error
+					alert('Transaction failed due to insufficient gas. Please increase your gas limit.');
+				} else if (error.message.includes('revert')) {
+					// Contract reversion error
+					alert('Transaction reverted. There might be an issue with the input data or contract logic.');
+				} else if (error.message.includes('invalid address')) {
+					// Invalid Ethereum address used
+					alert('Invalid address detected. Please check your account or contract address.');
+				} else if (error.message.includes('network')) {
+					// Network issue
+					alert('Network error. Please check your connection or the selected network in MetaMask.');
+				} else {
+					// Generic catch-all for other errors
+					//alert('An unexpected error occurred: '${error.message});
+				}
+			}
+
+        }
+
+        // Handle form submission
+        document.getElementById('add-credential-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const credentialTitle = document.getElementById('credential-title').value;
+            const organization = document.getElementById('organization').value;
+			const dateIssued = document.getElementById('date-issued').value;
+            // const dateIssued = new Date(document.getElementById('date-issued').value).getTime() / 1000; // Convert to UNIX timestamp
+
+            if (credentialTitle && organization && dateIssued) {
+                addCredential(credentialTitle, organization, dateIssued);
+            } else {
+                alert('Please fill out all fields');
+            }
+        });
+    </script>
+</body>
+
+</html>

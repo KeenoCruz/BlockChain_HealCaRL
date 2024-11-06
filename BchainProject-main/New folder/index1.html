@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width-device-width, initial scale-1.0">
+    <title>Connect to Remix Smart Contract</title>
+    <script scr="https://cdn.jsdeliver.net/gh/etherium/web3.js/dist/web3.win.js"></script>
+
+</head>
+<body>
+    <h1>Interact with Smart Contract</h1>
+
+    <!-- Connect metamask button -->
+    <button onclick="connectMetamask()">Connect Metamask</button>
+
+    <!-- get message button -->
+    <button onclick="getMessage()">Get Message</button>
+     
+    <!-- set message button -->
+    <button onclick="setMessage()">Set Message</button>
+
+    <!-- display message -->
+    <p><strong>Messge from contract: </strong> <span id="message"></span></p>
+
+    <script>
+        let contract;
+        let account;
+
+        // replace with contact address and ABI
+        const contractAddress = "0xBfFE5051bce88C417e964EFdfc91Bb0737eE504A";
+        const contractABI = [
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_newMessage",
+                        "type": "string"
+                    }
+                ],
+                "name": "setMessage",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_message",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [],
+                "name": "getMessage",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "message",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+
+        ];
+
+    // metamask connection
+    async function connectMetamask() {
+        if (typeof window.ethereum !== 'undefined'){
+            try{
+                await ethereum.request({method: 'eth_requestAccounts'});
+                const web3 = new Web3(window.ethereum);
+
+                // fetch connected accounts
+                const accounts = await web3.eth.getAccounts();
+                account = accounts[0]; //use first connected account
+                console.log("connected account: ", account);
+
+                // initialize contract
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+
+                alert("Metamask connected successfully!");
+
+            }catch(error){
+                console.error("Metamask connection failed: ", error);
+
+            }
+        }else{
+            alert("Metamsk is not installed. Please install to use this feature.");
+
+        }
+    }
+
+    async function getMessage() {
+        try{
+            const meeeage = await contract.methods.getMessage().call();
+            document.getElementById('message').innerText = message;
+        }catch(error){
+            console.error("Error fetching message from contract:", error);
+        }
+        
+        
+    }
+
+    async function setMessage() {
+        const newMessage = prompt("Enter a new message to store:");
+        if (newMessage) {
+            try{
+                await contract.methods.setMessage(newMessage).send({from: account});
+                alert("Message set successfully");
+            }catch(error){
+                console.error("Error setting message in contract:", error);
+                
+            }
+            
+        }
+    }
+    </script>
+</body>
+</html>

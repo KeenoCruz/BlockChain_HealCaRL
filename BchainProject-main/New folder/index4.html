@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Record Ledger</title>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+</head>
+<body>
+    <h2>Simple Health Record Ledger</h2>
+    <button onclick="connectWallet()">Connect Wallet</button>
+
+    <h3>Add Record</h3>
+    <label>Patient Name: </label><input type="text" id="name" /><br>
+    <label>Diagnosis: </label><input type="text" id="diagnosis" /><br>
+    <label>Treatment: </label><input type="text" id="treatment" /><br>
+    <button onclick="addRecord()">Add Record</button>
+
+    <h3>View Record by Number</h3>
+    <label>Record Number: </label><input type="number" id="recordIndex" min="0" /><br>
+    <button onclick="getRecordByIndex()">Get Record</button>
+    <div id="recordDetails"></div>
+
+    <script>
+        const contractAddress = '0x9bcBFC1B4a6bb0eBf1d49a12c37c17090e3dD0b0'; // Replace with deployed contract address
+        const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_diagnosis",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_treatment",
+				"type": "string"
+			}
+		],
+		"name": "addRecord",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getRecordByIndex",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getRecordCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "records",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "diagnosis",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "treatment",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]; // Replace with the contract's ABI
+        let web3;
+        let contract;
+        let accounts;
+
+		// if (typeof window.ethereum !== 'undefined'){
+        //     try {
+		// 			web3 = new Web3(window.ethereum);
+		// 			contract = new web3.eth.Contract(contractABI, contractAddress);
+        //         accounts = await window.ethereum.request({method: 'eth_requestAccounts'});  
+        //         alert("Connected to Metamask: " + accounts[0]);
+
+        //     } catch (error) {
+        //         console.error("Error conecting to Metamask: " + error)
+        //     }
+    
+        // }else{
+        //     console.error("Metamask is not installed or accessible")
+        // }
+
+
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined'){
+				try {
+					web3 = new Web3(window.ethereum);
+					contract = new web3.eth.Contract(contractABI, contractAddress);
+					accounts = await window.ethereum.request({method: 'eth_requestAccounts'});  
+					alert("Connected to Metamask: " + accounts[0]);
+
+				} catch (error) {
+					console.error("Error conecting to Metamask: " + error)
+				}
+		
+			}else{
+				console.error("Metamask is not installed or accessible")
+			}
+        }
+
+        async function addRecord() {
+            const name = document.getElementById("name").value;
+            const diagnosis = document.getElementById("diagnosis").value;
+            const treatment = document.getElementById("treatment").value;
+
+            if (!name || !diagnosis || !treatment) {
+                alert("All fields are required!");
+                return;
+            }
+
+            try {
+                await contract.methods.addRecord(name, diagnosis, treatment).send({ from: accounts[0] });
+                alert("Record added successfully!");
+            } catch (error) {
+                console.error("Failed to add record: ", error);
+                alert("Failed to add record: " + error.message);
+            }
+        }
+
+        // Fetch a specific record by index and display it
+        async function getRecordByIndex() {
+            const index = document.getElementById("recordIndex").value ;
+
+            if (index === "") {
+                alert("Please enter a record index.");
+                return;
+            }
+
+            try {
+                // Get the total number of records first
+                const recordCount = await contract.methods.getRecordCount().call();
+
+                // Check if the requested index is valid
+                if (index >= recordCount || index < 0) {
+                    alert("Invalid index. Please enter an index between 0 and " + (recordCount - 1));
+                    return;
+                }
+
+                const record = await contract.methods.getRecordByIndex(index).call();
+                const recordDetailsDiv = document.getElementById("recordDetails");
+
+                // Display record details
+                recordDetailsDiv.innerHTML = `<p><b>Record ${parseInt(index) + 1}:</b><br>
+                Name: ${record[0]}<br>
+                Diagnosis: ${record[1]}<br>
+                Treatment: ${record[2]}<br>
+                Timestamp: ${new Date(record[3] * 1000).toLocaleString()}</p>`;
+            } catch (error) {
+                console.error("Failed to fetch record: ", error);
+                alert("Failed to fetch record: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

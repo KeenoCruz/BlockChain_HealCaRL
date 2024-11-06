@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealCaRL: Healthcare Record Ledger</title>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+</head>
+<body>
+    <h2>HealCaRL: Healthcare Record Ledger</h2>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <br/><br/>
+    <div>
+        <h3>Register Patient</h3>
+        <label>Patient Address: </label><input type="text" id="patientAddress" />
+        <label>Patient Name: </label><input type="text" id="patientName" />
+        <button onclick="registerPatient()">Register Patient</button>
+    </div>
+    <br/>
+    <div>
+        <h3>Add Record</h3>
+        <label>Patient Address: </label><input type="text" id="recordPatientAddress" />
+        <label>Diagnosis: </label><input type="text" id="diagnosis" />
+        <label>Treatment: </label><input type="text" id="treatment" />
+        <button onclick="addRecord()">Add Record</button>
+    </div>
+    <br/>
+    <div>
+        <h3>View Records</h3>
+        <label>Patient Address: </label><input type="text" id="viewPatientAddress" />
+        <button onclick="getPatientRecords()">Get Records</button>
+        <div id="patientRecords"></div>
+    </div>
+
+    <script>
+        const contractAddress = '0x276139D5A879C91386400134896c2B0807fFfB95';
+        const contractABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_patient",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_diagnosis",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_treatment",
+				"type": "string"
+			}
+		],
+		"name": "addRecord",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "doctors",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_patient",
+				"type": "address"
+			}
+		],
+		"name": "getPatientRecords",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "diagnosis",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "treatment",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "timestamp",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct HealthcareRecordLedger.Record[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_patient",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			}
+		],
+		"name": "registerPatient",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_doctor",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "_status",
+				"type": "bool"
+			}
+		],
+		"name": "setDoctor",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+        let web3;
+        let contract;
+        let accounts;
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    web3 = new Web3(window.ethereum);
+                    accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    contract = new web3.eth.Contract(contractABI, contractAddress);
+                    console.log("Connected to Metamask. Account: ", accounts[0]);
+                } catch (error) {
+                    console.error("Connection failed: ", error);
+                }
+            } else {
+                alert("Please install Metamask to use this feature.");
+            }
+        }
+
+        async function registerPatient() {
+            const patientAddress = document.getElementById("patientAddress").value;
+            const patientName = document.getElementById("patientName").value;
+            try {
+                await contract.methods.registerPatient(patientAddress, patientName).send({ from: accounts[0] });
+                alert("Patient Registered Successfully!");
+            } catch (error) {
+                console.error("Failed to register patient: ", error);
+            }
+        }
+
+        async function addRecord() {
+            const patientAddress = document.getElementById("recordPatientAddress").value;
+            const diagnosis = document.getElementById("diagnosis").value;
+            const treatment = document.getElementById("treatment").value;
+            try {
+                await contract.methods.addRecord(patientAddress, diagnosis, treatment).send({ from: accounts[0] });
+                alert("Record Added Successfully!");
+            } catch (error) {
+                console.error("Failed to add record: ", error);
+            }
+        }
+
+        async function getPatientRecords() {
+            const patientAddress = document.getElementById("viewPatientAddress").value;
+            try {
+                const records = await contract.methods.getPatientRecords(patientAddress).call();
+                document.getElementById("patientRecords").innerHTML = JSON.stringify(records);
+            } catch (error) {
+                console.error("Failed to fetch records: ", error);
+            }
+        }
+        
+    </script>
+</body>
+</html>
